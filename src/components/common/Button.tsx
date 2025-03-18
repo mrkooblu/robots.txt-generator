@@ -35,7 +35,7 @@ const getBackgroundColor = (variant: ButtonVariant) => {
     case 'primary':
       return theme.colors.primary;
     case 'secondary':
-      return theme.colors.background.secondary;
+      return '#E1EFFE';
     case 'outline':
       return 'transparent';
     case 'danger':
@@ -52,7 +52,7 @@ const getHoverColor = (variant: ButtonVariant) => {
     case 'primary':
       return '#2563EB';
     case 'secondary':
-      return '#4B5563';
+      return '#C7D9FB';
     case 'outline':
       return '#F3F4F6';
     case 'danger':
@@ -68,6 +68,8 @@ const getBorderColor = (variant: ButtonVariant) => {
   switch (variant) {
     case 'outline':
       return theme.colors.border;
+    case 'secondary':
+      return '#BFDBFE';
     default:
       return 'transparent';
   }
@@ -76,6 +78,8 @@ const getBorderColor = (variant: ButtonVariant) => {
 const getTextColor = (variant: ButtonVariant) => {
   switch (variant) {
     case 'outline':
+      return theme.colors.primary;
+    case 'secondary':
       return theme.colors.primary;
     default:
       return '#FFFFFF';

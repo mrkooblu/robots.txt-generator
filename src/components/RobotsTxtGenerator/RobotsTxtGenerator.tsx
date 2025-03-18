@@ -97,6 +97,12 @@ const TabButton = styled.button<{ $active?: boolean }>`
     /* Center the icon */
     justify-content: center;
     min-width: 40px;
+    
+    .tab-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
   }
 `;
 
@@ -184,25 +190,25 @@ const RobotsTxtGenerator: React.FC = () => {
           $active={activeTab === 'basic'} 
           onClick={() => setActiveTab('basic')}
         >
-          <FaWrench size={16} /> <span>Basic Options</span>
+          <FaWrench size={16} className="tab-icon" /> <span>Basic Options</span>
         </TabButton>
         <TabButton 
           $active={activeTab === 'advanced'} 
           onClick={() => setActiveTab('advanced')}
         >
-          <FaCogs size={16} /> <span>Advanced Options</span>
+          <FaCogs size={16} className="tab-icon" /> <span>Advanced Options</span>
         </TabButton>
         <TabButton 
           $active={activeTab === 'cms'} 
           onClick={() => setActiveTab('cms')}
         >
-          <FaWordpress size={16} /> <span>CMS Templates</span>
+          <FaWordpress size={16} className="tab-icon" /> <span>CMS Templates</span>
         </TabButton>
         <TabButton 
           $active={activeTab === 'learn'} 
           onClick={() => setActiveTab('learn')}
         >
-          <FaBookOpen size={16} /> <span>Learn</span>
+          <FaBookOpen size={16} className="tab-icon" /> <span>Learn</span>
         </TabButton>
       </TabsContainer>
       

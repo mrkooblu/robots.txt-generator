@@ -92,6 +92,11 @@ const OptionLabel = styled.label`
   flex: 1;
   display: flex;
   align-items: center;
+  
+  @media (max-width: ${props => props.theme.breakpoints.sm}) {
+    font-size: 14px;
+    line-height: 1.3;
+  }
 `;
 
 const InfoIcon = styled.span`

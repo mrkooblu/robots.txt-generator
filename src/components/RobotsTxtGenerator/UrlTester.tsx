@@ -45,6 +45,32 @@ const Label = styled.label`
 const InputGroup = styled.div`
   display: flex;
   gap: 8px;
+  
+  @media (max-width: ${props => props.theme.breakpoints.sm}) {
+    flex-direction: column;
+    
+    /* Add some space between rows */
+    & > * + * {
+      margin-top: 8px;
+    }
+    
+    /* For the second row with dropdown and button */
+    & > *:not(:first-child) {
+      align-self: flex-start;
+    }
+    
+    /* Make the dropdown and button in a row */
+    & > select, & > button {
+      margin-top: 0;
+    }
+    
+    /* Create a sub-container for the dropdown and button */
+    &::after {
+      content: '';
+      display: flex;
+      gap: 8px;
+    }
+  }
 `;
 
 const Input = styled.input`
@@ -179,6 +205,23 @@ const Explanation = styled.p`
   background-color: #F3F4F6;
   border-radius: 4px;
   border-left: 3px solid #9CA3AF;
+`;
+
+// Add a helper container for the dropdown and button on mobile
+const MobileActionRow = styled.div`
+  display: flex;
+  gap: 8px;
+  
+  @media (min-width: ${props => props.theme.breakpoints.sm}) {
+    display: none;
+  }
+`;
+
+// Hide the desktop select and button on mobile
+const DesktopOnlyElement = styled.div`
+  @media (max-width: ${props => props.theme.breakpoints.sm}) {
+    display: none;
+  }
 `;
 
 // Bot options as specified in the requirements
@@ -329,21 +372,42 @@ const UrlTester: React.FC<UrlTesterProps> = ({ rules }) => {
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://example.com/page"
           />
-          <Select
-            value={selectedBot}
-            onChange={(e) => setSelectedBot(e.target.value)}
-          >
-            {botOptions.map(bot => (
-              <option key={bot} value={bot}>{bot}</option>
-            ))}
-          </Select>
-          <Button 
-            variant="primary" 
-            size="sm" 
-            onClick={testUrl}
-          >
-            Test
-          </Button>
+          <DesktopOnlyElement>
+            <Select
+              value={selectedBot}
+              onChange={(e) => setSelectedBot(e.target.value)}
+            >
+              {botOptions.map(bot => (
+                <option key={bot} value={bot}>{bot}</option>
+              ))}
+            </Select>
+          </DesktopOnlyElement>
+          <DesktopOnlyElement>
+            <Button 
+              variant="primary" 
+              size="sm" 
+              onClick={testUrl}
+            >
+              Test
+            </Button>
+          </DesktopOnlyElement>
+          <MobileActionRow>
+            <Select
+              value={selectedBot}
+              onChange={(e) => setSelectedBot(e.target.value)}
+            >
+              {botOptions.map(bot => (
+                <option key={bot} value={bot}>{bot}</option>
+              ))}
+            </Select>
+            <Button 
+              variant="primary" 
+              size="sm" 
+              onClick={testUrl}
+            >
+              Test
+            </Button>
+          </MobileActionRow>
         </InputGroup>
       </FormGroup>
       
