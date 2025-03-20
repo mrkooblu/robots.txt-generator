@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import Button from '../common/Button';
@@ -8,6 +8,8 @@ import Tooltip from '../common/Tooltip';
 import { RobotRule, AllowDisallow } from './RobotsTxtGenerator';
 import { FaInfoCircle, FaPlus, FaMinus, FaLightbulb } from 'react-icons/fa';
 import GlossaryTermTooltip from './GlossaryTerms';
+import SemrushTooltip from '../common/SemrushTooltip';
+import { getRandomTipForField } from '@/data/SemrushTooltipTips';
 
 interface CustomRuleBuilderProps {
   onAddRule: (rule: RobotRule) => void;
@@ -288,6 +290,14 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
   const [selectedBots, setSelectedBots] = useState<string[]>(['All']);
   const [selectedPattern, setSelectedPattern] = useState<string>("");
   
+  // Define placeholder patterns for the path input
+  const placeholderByPattern: Record<string, string> = {
+    exact: "/exact-page/",
+    directory: "/directory/",
+    wildcard: "/section-*/*.html",
+    extension: "/*.pdf$"
+  };
+  
   const toggleBot = (bot: string) => {
     if (bot === 'All') {
       setSelectedBots(['All']);
@@ -315,78 +325,67 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
   const handlePatternChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedPattern(value);
-    
-    if (value) {
-      setPath(value);
-    }
   };
   
   const handlePathChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPath(e.target.value);
-    setSelectedPattern("");
   };
   
   const handleAddRule = () => {
     if (!path.trim()) {
-      alert("Please enter a path");
       return;
     }
     
-    // Handle multiple paths separated by commas
-    if (path.includes(',')) {
-      const paths = path.split(',').map(p => p.trim()).filter(p => p);
-      
-      // Create a rule for each path
-      paths.forEach(singlePath => {
-        const newRule: RobotRule = {
-          id: uuidv4(),
-          bot: selectedBots,
-          path: singlePath,
-          permission,
-          comment: comment ? comment : undefined,
-        };
-        
-        onAddRule(newRule);
-      });
-    } else {
-      const newRule: RobotRule = {
-        id: uuidv4(),
-        bot: selectedBots,
-        path,
-        permission,
-        comment: comment ? comment : undefined,
-      };
-      
-      onAddRule(newRule);
-    }
+    onAddRule({
+      id: uuidv4(),
+      permission,
+      path,
+      bot: selectedBots,
+      comment: comment || undefined
+    });
     
-    // Reset form
+    // Reset the form
     setPath('');
     setComment('');
-    setSelectedPattern("");
     setPermission('allow');
     setSelectedBots(['All']);
+    setSelectedPattern('');
   };
 
   return (
-    <Container>
-      <Title>
-        <FaPlus size={14} />
-        Rule Builder
-      </Title>
-      
-      <Description>
-        Create specific rules to control how search engines interact with your site. 
-        Each rule consists of targeted <GlossaryTermTooltip term="user-agent">User-agents</GlossaryTermTooltip>, 
-        an <GlossaryTermTooltip term="allow">Allow</GlossaryTermTooltip> or 
-        <GlossaryTermTooltip term="disallow">Disallow</GlossaryTermTooltip> directive, 
-        and a path pattern.
-      </Description>
+    <div>
+      <FormGroup>
+        <Label>
+          Path to allow or disallow
+          <SemrushTooltip 
+            tip={getRandomTipForField('path').tip}
+            semrushLink={getRandomTipForField('path').semrushLink}
+            linkText={getRandomTipForField('path').linkText}
+            position="top"
+          />
+        </Label>
+        <FlexRow>
+          <Select
+            value={selectedPattern}
+            onChange={handlePatternChange}
+            style={{ width: 'auto', marginRight: '8px' }}
+          >
+            <option value="">Select pattern</option>
+            <option value="exact">Exact path</option>
+            <option value="directory">Directory</option>
+            <option value="wildcard">Wildcard</option>
+            <option value="extension">File extension</option>
+          </Select>
+          <Input
+            type="text"
+            value={path}
+            onChange={handlePathChange}
+            placeholder={selectedPattern ? placeholderByPattern[selectedPattern] : "e.g. /wp-admin/, /*.pdf$"}
+          />
+        </FlexRow>
+      </FormGroup>
       
       <Callout>
-        <CalloutIcon>
-          <FaLightbulb size={18} />
-        </CalloutIcon>
         <CalloutContent>
           <strong>Pro Tip:</strong> Be specific with your paths. Using <GlossaryTermTooltip term="wildcards">wildcards</GlossaryTermTooltip> like 
           * and $ can help target multiple similar URLs. For example, <code>/*.pdf$</code> targets all PDF files.
@@ -396,12 +395,12 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
       <FormGroup>
         <Label>
           Which bots should this rule apply to?
-          <Tooltip 
-            content="Select 'All' to apply to all bots, or select specific bots. Multiple bots can be selected. Different search engines use different bots to crawl your site for different purposes."
+          <SemrushTooltip 
+            tip={getRandomTipForField('user-agent').tip}
+            semrushLink={getRandomTipForField('user-agent').semrushLink}
+            linkText={getRandomTipForField('user-agent').linkText}
             position="top"
-          >
-            <InfoIcon size={16} />
-          </Tooltip>
+          />
         </Label>
         <BotSelector>
           {botOptions.map(bot => (
@@ -420,13 +419,12 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
       <FormGroup>
         <Label>
           Permission
-          <Tooltip 
-            content="'Allow' permits crawling of the specified paths. 'Disallow' prevents crawling. Note that 'Disallow' does not prevent indexing if other pages link to the content."
+          <SemrushTooltip 
+            tip={getRandomTipForField('permission').tip}
+            semrushLink={getRandomTipForField('permission').semrushLink}
+            linkText={getRandomTipForField('permission').linkText}
             position="top"
-            maxWidth="300px"
-          >
-            <InfoIcon size={16} />
-          </Tooltip>
+          />
         </Label>
         <Select 
           value={permission} 
@@ -443,60 +441,19 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
       
       <FormGroup>
         <Label>
-          Path Pattern
-          <Tooltip 
-            content="Select a common pattern or create your own. You can use wildcards (*) to match any sequence of characters and $ to match the end of a URL. For example, '/*.pdf$' matches all PDF files."
-            position="top"
-            maxWidth="300px"
-          >
-            <InfoIcon size={16} />
-          </Tooltip>
-        </Label>
-        <Select 
-          value={selectedPattern} 
-          onChange={handlePatternChange}
-        >
-          <option value="">Select a pattern or enter custom path below</option>
-          {pathPatterns.map((pattern, index) => (
-            <option key={index} value={pattern.value}>{pattern.label}</option>
-          ))}
-        </Select>
-      </FormGroup>
-      
-      <FormGroup>
-        <Label>
-          Path
-          <Tooltip 
-            content="The URL path to allow or disallow. Use '/' for the entire site. Always include the leading slash. Separate multiple paths with commas. Use wildcards (*) for pattern matching."
-            position="top"
-            maxWidth="300px"
-          >
-            <InfoIcon size={16} />
-          </Tooltip>
-        </Label>
-        <Input 
-          type="text" 
-          value={path} 
-          onChange={handlePathChange}
-          placeholder="e.g. /admin/, /*.pdf$, /wp-*"
-        />
-      </FormGroup>
-      
-      <FormGroup>
-        <Label>
           Comment (optional)
           <Tooltip 
-            content="Add a descriptive comment for this rule. Comments help document your robots.txt file and explain the purpose of each rule. They will be included in the robots.txt file prefixed with #."
+            content="Add a comment to explain what this rule does. Comments are included in your robots.txt file but ignored by search engines."
             position="top"
-            maxWidth="300px"
           >
             <InfoIcon size={16} />
           </Tooltip>
         </Label>
-        <TextArea 
-          value={comment} 
+        <Input
+          type="text"
+          value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="e.g. Block access to admin area"
+          placeholder="E.g., Block admin pages from all search engines"
         />
       </FormGroup>
       
@@ -509,7 +466,7 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
           Add Rule
         </Button>
       </ButtonGroup>
-    </Container>
+    </div>
   );
 };
 

@@ -35,6 +35,10 @@ body {
   line-height: 32px;
   color: var(--text-color);
   background-color: var(--background-color);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -115,4 +119,30 @@ p {
   .tab-active {
     @apply border-b-2 border-primary;
   }
+}
+
+/* Responsive containers for tip widgets */
+@media (max-width: 768px) {
+  .tip-widget-container {
+    width: 100%;
+    position: static;
+    margin-top: 24px;
+  }
+  
+  .inline-tip {
+    font-size: 14px;
+  }
+}
+
+/* Ensure tips are readable on small screens */
+@media (max-width: 480px) {
+  .inline-tip {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
+
+/* Ensure smooth transitions for tips */
+.tip-transition {
+  transition: all 0.3s ease;
 } 

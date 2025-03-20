@@ -4,6 +4,13 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaLightbulb, FaExclamationTriangle, FaBookOpen, FaArrowRight } from 'react-icons/fa';
 import Tooltip from '../common/Tooltip';
+import SemrushTabTip from '../common/SemrushTabTip';
+import { 
+  BEST_PRACTICES_TIPS, 
+  COMMON_MISTAKES_TIPS, 
+  EXAMPLES_TIPS,
+  getTipForSection
+} from '@/data/SemrushTabTooltips';
 
 // Types for educational content
 type TutorialStep = {
@@ -139,6 +146,8 @@ const StepTitle = styled.h4`
   font-weight: 600;
   color: #111827;
   margin: 0 0 12px 0;
+  position: relative;
+  padding-top: 10px;
 `;
 
 const StepContent = styled.div`
@@ -452,13 +461,35 @@ const EducationalContent: React.FC = () => {
             </Description>
             
             <PracticesList>
-              {bestPractices.map((practice, index) => (
-                <PracticeItem key={index}>
-                  <StepTitle>{practice.title}</StepTitle>
-                  <StepContent>{practice.description}</StepContent>
-                  <CodeExample>{practice.example}</CodeExample>
-                </PracticeItem>
-              ))}
+              {bestPractices.map((practice, index) => {
+                // Get the corresponding Semrush tip
+                const tipSectionId = practice.title === 'Be Specific with User-Agents' ? 'user-agents' :
+                                    practice.title === 'Differentiate Allow and Disallow' ? 'allow-disallow' :
+                                    practice.title === 'Always Include a Sitemap' ? 'sitemap' :
+                                    practice.title === 'Test Before Deploying' ? 'testing' :
+                                    practice.title === 'Don\'t Block CSS or JavaScript' ? 'resources' : '';
+                
+                const semrushTip = BEST_PRACTICES_TIPS.find(tip => tip.sectionId === tipSectionId);
+                
+                return (
+                  <PracticeItem key={index}>
+                    <div style={{ position: 'relative', paddingTop: '10px' }}>
+                      {semrushTip ? (
+                        <SemrushTabTip 
+                          heading={practice.title}
+                          tip={semrushTip.tip}
+                          semrushLink={semrushTip.semrushLink}
+                          linkText={semrushTip.linkText}
+                        />
+                      ) : (
+                        <StepTitle>{practice.title}</StepTitle>
+                      )}
+                    </div>
+                    <StepContent>{practice.description}</StepContent>
+                    <CodeExample>{practice.example}</CodeExample>
+                  </PracticeItem>
+                );
+              })}
             </PracticesList>
           </>
         )}
@@ -471,13 +502,35 @@ const EducationalContent: React.FC = () => {
             </Description>
             
             <MistakesList>
-              {commonMistakes.map((mistake, index) => (
-                <MistakeItem key={index}>
-                  <StepTitle>{mistake.mistake}</StepTitle>
-                  <StepContent>{mistake.explanation}</StepContent>
-                  <StepContent><strong>Solution:</strong> {mistake.correction}</StepContent>
-                </MistakeItem>
-              ))}
+              {commonMistakes.map((mistake, index) => {
+                // Get the corresponding Semrush tip
+                const tipSectionId = mistake.mistake === 'Using robots.txt for privacy' ? 'privacy' :
+                                    mistake.mistake === 'Blocking entire site unintentionally' ? 'blocking-site' :
+                                    mistake.mistake === 'Forgetting the leading slash' ? 'leading-slash' :
+                                    mistake.mistake === 'Using incorrect syntax' ? 'syntax' :
+                                    mistake.mistake === 'Contradictory or conflicting rules' ? 'conflicting-rules' : '';
+                
+                const semrushTip = COMMON_MISTAKES_TIPS.find(tip => tip.sectionId === tipSectionId);
+                
+                return (
+                  <MistakeItem key={index}>
+                    <div style={{ position: 'relative', paddingTop: '10px' }}>
+                      {semrushTip ? (
+                        <SemrushTabTip 
+                          heading={mistake.mistake}
+                          tip={semrushTip.tip}
+                          semrushLink={semrushTip.semrushLink}
+                          linkText={semrushTip.linkText}
+                        />
+                      ) : (
+                        <StepTitle>{mistake.mistake}</StepTitle>
+                      )}
+                    </div>
+                    <StepContent>{mistake.explanation}</StepContent>
+                    <StepContent><strong>Solution:</strong> {mistake.correction}</StepContent>
+                  </MistakeItem>
+                );
+              })}
             </MistakesList>
           </>
         )}
@@ -489,13 +542,33 @@ const EducationalContent: React.FC = () => {
               These examples show how different types of websites typically configure their robots.txt files.
             </Description>
             
-            {realWorldExamples.map((example, index) => (
-              <ExampleCard key={index}>
-                <ExampleTitle>{example.siteName}</ExampleTitle>
-                <StepContent>{example.description}</StepContent>
-                <CodeExample>{example.robotsTxtSnippet}</CodeExample>
-              </ExampleCard>
-            ))}
+            {realWorldExamples.map((example, index) => {
+              // Get the corresponding Semrush tip
+              const tipSectionId = example.siteName === 'E-commerce Site' ? 'ecommerce' :
+                                  example.siteName.includes('Blog') || example.siteName.includes('Content') ? 'blog' :
+                                  example.siteName === 'Corporate Website' ? 'corporate' : '';
+              
+              const semrushTip = EXAMPLES_TIPS.find(tip => tip.sectionId === tipSectionId);
+              
+              return (
+                <ExampleCard key={index}>
+                  <div style={{ position: 'relative', paddingTop: '10px' }}>
+                    {semrushTip ? (
+                      <SemrushTabTip 
+                        heading={example.siteName}
+                        tip={semrushTip.tip}
+                        semrushLink={semrushTip.semrushLink}
+                        linkText={semrushTip.linkText}
+                      />
+                    ) : (
+                      <ExampleTitle>{example.siteName}</ExampleTitle>
+                    )}
+                  </div>
+                  <StepContent>{example.description}</StepContent>
+                  <CodeExample>{example.robotsTxtSnippet}</CodeExample>
+                </ExampleCard>
+              );
+            })}
           </>
         )}
       </ContentContainer>

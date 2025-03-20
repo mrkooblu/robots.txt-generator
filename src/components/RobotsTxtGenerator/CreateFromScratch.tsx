@@ -5,11 +5,13 @@ import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import Button from '../common/Button';
 import Tooltip from '../common/Tooltip';
+import SemrushTooltip from '../common/SemrushTooltip';
 import { RobotRule, Sitemap, AllowDisallow, generateRobotsTxt } from './RobotsTxtGenerator';
 import { FaInfoCircle, FaClipboard, FaImages, FaUndo, FaPlus, FaLayerGroup } from 'react-icons/fa';
 import CustomRuleBuilder from './CustomRuleBuilder';
 import DraggableRuleList from './DraggableRuleList';
 import UrlTester from './UrlTester';
+import { getRandomTipForField } from '@/data/SemrushTooltipTips';
 
 interface CreateFromScratchProps {
   rules: RobotRule[];
@@ -349,33 +351,56 @@ const CreateFromScratch: React.FC<CreateFromScratchProps> = ({
           />
           
           <QuickActionRow>
-            <Button 
-              onClick={copyEssentialFiles} 
-              variant="secondary" 
-              size="sm"
-              icon={<FaClipboard />}
-            >
-              Add essential files template
-            </Button>
-            <Button 
-              onClick={copyAllImages} 
-              variant="secondary" 
-              size="sm" 
-              icon={<FaImages />}
-            >
-              Add block images template
-            </Button>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <Button 
+                onClick={copyEssentialFiles} 
+                variant="secondary" 
+                size="sm"
+                icon={<FaClipboard />}
+              >
+                Add essential files template
+              </Button>
+              <span style={{ position: 'absolute', top: '-8px', right: '-8px' }}>
+                <SemrushTooltip 
+                  tip={getRandomTipForField('essential-files').tip}
+                  semrushLink={getRandomTipForField('essential-files').semrushLink}
+                  linkText={getRandomTipForField('essential-files').linkText}
+                  position="top"
+                  size={14}
+                />
+              </span>
+            </div>
+            
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <Button 
+                onClick={copyAllImages} 
+                variant="secondary" 
+                size="sm" 
+                icon={<FaImages />}
+              >
+                Add block images template
+              </Button>
+              <span style={{ position: 'absolute', top: '-8px', right: '-8px' }}>
+                <SemrushTooltip 
+                  tip={getRandomTipForField('block-images').tip}
+                  semrushLink={getRandomTipForField('block-images').semrushLink}
+                  linkText={getRandomTipForField('block-images').linkText}
+                  position="top"
+                  size={14}
+                />
+              </span>
+            </div>
           </QuickActionRow>
           
           <SitemapSection>
             <SitemapLabel>
               Your sitemap file
-              <Tooltip 
-                content="Enter the URL of your XML sitemap. This helps search engines discover and crawl all the pages on your site."
+              <SemrushTooltip 
+                tip={getRandomTipForField('sitemap').tip}
+                semrushLink={getRandomTipForField('sitemap').semrushLink}
+                linkText={getRandomTipForField('sitemap').linkText}
                 position="top"
-              >
-                <InfoIcon size={16} />
-              </Tooltip>
+              />
             </SitemapLabel>
             <Input
               type="text"

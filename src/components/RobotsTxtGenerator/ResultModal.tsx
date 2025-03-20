@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import Button from '../common/Button';
-import { FaClipboard, FaDownload, FaTimes, FaCode } from 'react-icons/fa';
+import { FaClipboard, FaDownload, FaTimes, FaCode, FaCheck, FaExclamationTriangle, FaBook, FaStar } from 'react-icons/fa';
 import SyntaxValidator from './SyntaxValidator';
+import SemrushTip from '../common/SemrushTip';
 
 interface ResultModalProps {
   isOpen: boolean;
@@ -116,6 +117,7 @@ const Tabs = styled.div`
   display: flex;
   border-bottom: 1px solid #E5E7EB;
   margin-bottom: 16px;
+  flex-wrap: wrap;
 `;
 
 const Tab = styled.button<{ $active: boolean }>`
@@ -130,9 +132,151 @@ const Tab = styled.button<{ $active: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
+  position: relative;
   
   &:hover {
     color: #111827;
+  }
+`;
+
+const TabIndicator = styled.span`
+  position: absolute;
+  top: -8px;
+  right: -3px;
+  background-color: #ff642d;
+  color: white;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  
+  &:hover::after {
+    content: 'Semrush SEO Tips Available';
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1F2937;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+    font-weight: normal;
+    letter-spacing: normal;
+  }
+  
+  &:hover::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #1F2937 transparent transparent transparent;
+    z-index: 10;
+  }
+`;
+
+const TipContainer = styled.div`
+  margin-top: 24px;
+`;
+
+const TipSection = styled.div`
+  margin-bottom: 24px;
+`;
+
+const TipList = styled.ul`
+  margin: 12px 0;
+  padding-left: 20px;
+`;
+
+const TipItem = styled.li`
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+`;
+
+const TipTitle = styled.h4`
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+`;
+
+const TipContent = styled.p`
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #4B5563;
+`;
+
+const SemrushLink = styled.a`
+  color: #3B82F6;
+  font-weight: 500;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const ExampleCode = styled.code`
+  display: block;
+  background-color: #F9FAFB;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #E5E7EB;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 8px 0 16px 0;
+  white-space: pre-wrap;
+`;
+
+const SemrushPromo = styled.div`
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #ff642d;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const PromoIcon = styled.div`
+  color: #ff642d;
+  font-size: 1.5rem;
+`;
+
+const PromoContent = styled.div`
+  flex: 1;
+`;
+
+const PromoHeading = styled.h4`
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: #333;
+`;
+
+const PromoText = styled.p`
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+`;
+
+const PromoLink = styled.a`
+  color: #ff642d;
+  text-decoration: none;
+  font-weight: 500;
+  &:hover {
+    text-decoration: underline;
   }
 `;
 
@@ -140,6 +284,11 @@ const ResultModal: React.FC<ResultModalProps> = ({ isOpen, onClose, robotsTxt })
   const [copySuccess, setCopySuccess] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<'code' | 'validator'>('code');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  
+  // Show a tip about site audit when modal opens
+  useEffect(() => {
+    // Any additional modal opening logic can go here
+  }, [isOpen]);
 
   const copyToClipboard = () => {
     if (textAreaRef.current) {
@@ -174,18 +323,24 @@ const ResultModal: React.FC<ResultModalProps> = ({ isOpen, onClose, robotsTxt })
           </CloseButton>
         </ModalHeader>
         <ModalBody>
+          <TipContainer>
+            <SemrushTip trigger="general" />
+          </TipContainer>
+          
           <Tabs>
-            <Tab 
-              $active={activeTab === 'code'} 
+            <Tab
+              type="button"
+              $active={activeTab === 'code'}
               onClick={() => setActiveTab('code')}
             >
-              <FaCode size={14} /> Code
+              <FaCode /> Code
             </Tab>
-            <Tab 
-              $active={activeTab === 'validator'} 
+            <Tab
+              type="button"
+              $active={activeTab === 'validator'}
               onClick={() => setActiveTab('validator')}
             >
-              <FaCode size={14} /> Syntax Validator
+              <FaCode /> Syntax Validator
             </Tab>
           </Tabs>
         
@@ -228,6 +383,19 @@ const ResultModal: React.FC<ResultModalProps> = ({ isOpen, onClose, robotsTxt })
               Download robots.txt
             </Button>
           </ActionButtons>
+          
+          <SemrushPromo>
+            <PromoIcon><FaStar /></PromoIcon>
+            <PromoContent>
+              <PromoHeading>Optimize your robots.txt file with Semrush</PromoHeading>
+              <PromoText>
+                Get deeper insights into how search engines crawl your site. Improve your website's SEO performance with Semrush's Site Audit tool.{' '}
+                <PromoLink href="https://www.semrush.com/site-audit/" target="_blank" rel="noopener noreferrer">
+                  Try it free &rarr;
+                </PromoLink>
+              </PromoText>
+            </PromoContent>
+          </SemrushPromo>
         </ModalBody>
       </ModalContent>
     </ModalOverlay>
