@@ -10,7 +10,7 @@ import SemrushTip from '../common/SemrushTip';
 interface ResultModalProps {
   isOpen: boolean;
   onClose: () => void;
-  robotsTxt: string;
+  content: string;
 }
 
 const ModalOverlay = styled.div<{ $isOpen: boolean }>`
@@ -280,7 +280,7 @@ const PromoLink = styled.a`
   }
 `;
 
-const ResultModal: React.FC<ResultModalProps> = ({ isOpen, onClose, robotsTxt }) => {
+const ResultModal: React.FC<ResultModalProps> = ({ isOpen, onClose, content }) => {
   const [copySuccess, setCopySuccess] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<'code' | 'validator'>('code');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -305,7 +305,7 @@ const ResultModal: React.FC<ResultModalProps> = ({ isOpen, onClose, robotsTxt })
   // Create a download as a text file
   const downloadRobotsTxt = () => {
     const element = document.createElement('a');
-    const file = new Blob([robotsTxt], { type: 'text/plain' });
+    const file = new Blob([content], { type: 'text/plain' });
     element.href = URL.createObjectURL(file);
     element.download = 'robots.txt';
     document.body.appendChild(element);
@@ -346,12 +346,12 @@ const ResultModal: React.FC<ResultModalProps> = ({ isOpen, onClose, robotsTxt })
         
           {activeTab === 'code' && (
             <>
-              <CodeDisplay>{robotsTxt}</CodeDisplay>
+              <CodeDisplay>{content}</CodeDisplay>
               
               {/* Hidden textarea for copy functionality */}
               <textarea
                 ref={textAreaRef}
-                value={robotsTxt}
+                value={content}
                 style={{ position: 'absolute', left: '-9999px' }}
                 readOnly
               />
@@ -363,7 +363,7 @@ const ResultModal: React.FC<ResultModalProps> = ({ isOpen, onClose, robotsTxt })
           )}
           
           {activeTab === 'validator' && (
-            <SyntaxValidator robotsTxt={robotsTxt} />
+            <SyntaxValidator robotsTxt={content} />
           )}
           
           <ActionButtons>

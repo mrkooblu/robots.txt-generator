@@ -10,6 +10,9 @@ import Button from '../common/Button';
 import ResultModal from './ResultModal';
 import EducationalContent from './EducationalContent';
 import { FaWrench, FaCogs, FaWordpress, FaBookOpen } from 'react-icons/fa';
+import { useToast } from '../common/Toast';
+import ErrorBoundary from '../common/ErrorBoundary';
+import LoadingButton from '../common/LoadingButton';
 
 // Types
 export type AllowDisallow = 'allow' | 'disallow';
@@ -47,6 +50,11 @@ const TabsContainer = styled.div`
   
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     margin-bottom: 16px;
+  }
+  
+  @media (max-width: 320px) {
+    margin-bottom: 12px;
+    padding: 0 4px;
   }
 `;
 
@@ -102,6 +110,17 @@ const TabButton = styled.button<{ $active?: boolean }>`
       font-size: 20px;
       width: 20px;
       height: 20px;
+    }
+  }
+  
+  @media (max-width: 320px) {
+    min-width: 36px;
+    padding: 8px;
+    
+    .tab-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
   }
 `;
@@ -166,17 +185,32 @@ const RobotsTxtGenerator: React.FC = () => {
   const [robotsTxt, setRobotsTxt] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [disclaimerAgreed, setDisclaimerAgreed] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const { showToast } = useToast();
   
   const handleGenerateRobotsTxt = () => {
-    const content = generateRobotsTxt(rules, sitemap);
-    setRobotsTxt(content);
-    setIsModalOpen(true);
+    try {
+      setIsGenerating(true);
+      // Simulate async operation
+      setTimeout(() => {
+        const content = generateRobotsTxt(rules, sitemap);
+        setRobotsTxt(content);
+        setIsModalOpen(true);
+        setIsGenerating(false);
+        showToast('success', 'Successfully generated robots.txt');
+      }, 800);
+    } catch (error) {
+      setIsGenerating(false);
+      showToast('error', 'Failed to generate robots.txt');
+      console.error('Error generating robots.txt:', error);
+    }
   };
   
   const handleReset = () => {
     setRules(initialRules);
     setSitemap(initialSitemap);
     setDisclaimerAgreed(false);
+    showToast('info', 'Reset to default values');
   };
 
   const handleCloseModal = () => {
@@ -184,76 +218,81 @@ const RobotsTxtGenerator: React.FC = () => {
   };
 
   return (
-    <div>
-      <TabsContainer>
-        <TabButton 
-          $active={activeTab === 'basic'} 
-          onClick={() => setActiveTab('basic')}
-        >
-          <FaWrench size={16} className="tab-icon" /> <span>Basic Options</span>
-        </TabButton>
-        <TabButton 
-          $active={activeTab === 'advanced'} 
-          onClick={() => setActiveTab('advanced')}
-        >
-          <FaCogs size={16} className="tab-icon" /> <span>Advanced Options</span>
-        </TabButton>
-        <TabButton 
-          $active={activeTab === 'cms'} 
-          onClick={() => setActiveTab('cms')}
-        >
-          <FaWordpress size={16} className="tab-icon" /> <span>CMS Templates</span>
-        </TabButton>
-        <TabButton 
-          $active={activeTab === 'learn'} 
-          onClick={() => setActiveTab('learn')}
-        >
-          <FaBookOpen size={16} className="tab-icon" /> <span>Learn</span>
-        </TabButton>
-      </TabsContainer>
-      
-      <Card>
-        {activeTab === 'basic' && (
-          <Suggestions 
-            onRulesChange={setRules}
-            onSitemapChange={setSitemap}
-            onTabChange={() => setActiveTab('advanced')}
-            onGenerate={handleGenerateRobotsTxt}
-            suggestionsType="general"
-          />
-        )}
-        {activeTab === 'advanced' && (
-          <CreateFromScratch 
-            rules={rules}
-            sitemap={sitemap}
-            onRulesChange={setRules}
-            onSitemapChange={setSitemap}
-            onGenerate={handleGenerateRobotsTxt}
-            onReset={handleReset}
-            disclaimerAgreed={disclaimerAgreed}
-            onDisclaimerChange={setDisclaimerAgreed}
-          />
-        )}
-        {activeTab === 'cms' && (
-          <Suggestions 
-            onRulesChange={setRules}
-            onSitemapChange={setSitemap}
-            onTabChange={() => setActiveTab('advanced')}
-            onGenerate={handleGenerateRobotsTxt}
-            suggestionsType="cms"
-          />
-        )}
-        {activeTab === 'learn' && (
-          <EducationalContent />
-        )}
-      </Card>
-      
-      <ResultModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        robotsTxt={robotsTxt}
-      />
-    </div>
+    <ErrorBoundary>
+      <div>
+        <TabsContainer>
+          <TabButton 
+            $active={activeTab === 'basic'} 
+            onClick={() => setActiveTab('basic')}
+          >
+            <FaWrench size={16} className="tab-icon" /> <span>Basic Options</span>
+          </TabButton>
+          <TabButton 
+            $active={activeTab === 'advanced'} 
+            onClick={() => setActiveTab('advanced')}
+          >
+            <FaCogs size={16} className="tab-icon" /> <span>Advanced Options</span>
+          </TabButton>
+          <TabButton 
+            $active={activeTab === 'cms'} 
+            onClick={() => setActiveTab('cms')}
+          >
+            <FaWordpress size={16} className="tab-icon" /> <span>CMS Templates</span>
+          </TabButton>
+          <TabButton 
+            $active={activeTab === 'learn'} 
+            onClick={() => setActiveTab('learn')}
+          >
+            <FaBookOpen size={16} className="tab-icon" /> <span>Learn</span>
+          </TabButton>
+        </TabsContainer>
+        
+        <Card>
+          {activeTab === 'basic' && (
+            <Suggestions 
+              onRulesChange={setRules}
+              onSitemapChange={setSitemap}
+              onTabChange={() => setActiveTab('advanced')}
+              onGenerate={handleGenerateRobotsTxt}
+              suggestionsType="general"
+              isGenerating={isGenerating}
+            />
+          )}
+          {activeTab === 'advanced' && (
+            <CreateFromScratch 
+              rules={rules}
+              sitemap={sitemap}
+              onRulesChange={setRules}
+              onSitemapChange={setSitemap}
+              onGenerate={handleGenerateRobotsTxt}
+              onReset={handleReset}
+              disclaimerAgreed={disclaimerAgreed}
+              onDisclaimerChange={setDisclaimerAgreed}
+              isGenerating={isGenerating}
+            />
+          )}
+          {activeTab === 'cms' && (
+            <Suggestions 
+              onRulesChange={setRules}
+              onSitemapChange={setSitemap}
+              onTabChange={() => setActiveTab('advanced')}
+              onGenerate={handleGenerateRobotsTxt}
+              suggestionsType="cms"
+              isGenerating={isGenerating}
+            />
+          )}
+          {activeTab === 'learn' && (
+            <EducationalContent />
+          )}
+        </Card>
+        
+        <ResultModal 
+          isOpen={isModalOpen} 
+          onClose={handleCloseModal} 
+          content={robotsTxt}
+        />
+      </div>
+    </ErrorBoundary>
   );
 };
 

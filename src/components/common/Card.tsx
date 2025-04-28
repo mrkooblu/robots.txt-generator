@@ -13,9 +13,9 @@ interface CardProps {
 }
 
 const StyledCard = styled.div<{
-  $padding: string;
-  $borderRadius: string;
-  $interactive: boolean;
+  $padding: string,
+  $borderRadius: string,
+  $interactive: boolean,
 }>`
   background-color: ${props => props.theme.colors.background.card};
   border: 1px solid ${props => props.theme.colors.border};
@@ -33,6 +33,10 @@ const StyledCard = styled.div<{
   
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     padding: ${props => props.$padding === '24px' ? '12px' : props.$padding};
+  }
+  
+  @media (max-width: 320px) {
+    padding: 12px 8px;
   }
   
   ${props => props.$interactive && `
@@ -68,4 +72,4 @@ const Card: React.FC<CardProps> = ({
   );
 };
 
-export default Card; 
+export default Card;

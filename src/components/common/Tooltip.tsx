@@ -33,18 +33,18 @@ const TooltipContent = styled.div<{
   $left: number;
 }>`
   position: fixed;
-  background-color: #2D3748;
+  background-color: #1E293B; /* Dark navy background */
   color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border-radius: 8px;
   font-size: 14px;
   z-index: 9999;
   opacity: ${(props) => (props.$visible ? 1 : 0)};
   visibility: ${(props) => (props.$visible ? 'visible' : 'hidden')};
   transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
   max-width: ${(props) => props.$maxWidth};
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-  line-height: 1.5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
   text-align: left;
   white-space: normal;
   word-wrap: break-word;
@@ -54,58 +54,58 @@ const TooltipContent = styled.div<{
   transform: ${props => {
     switch (props.$position) {
       case 'top':
-        return 'translate(-50%, -100%) translateY(-8px)';
+        return 'translate(-50%, -100%) translateY(-10px)';
       case 'right':
-        return 'translateY(-50%) translateX(8px)';
+        return 'translateY(-50%) translateX(10px)';
       case 'bottom':
-        return 'translate(-50%, 0) translateY(8px)';
+        return 'translate(-50%, 0) translateY(10px)';
       case 'left':
-        return 'translateY(-50%) translateX(-8px)';
+        return 'translateY(-50%) translateX(-10px)';
       default:
         return '';
     }
   }};
   
   @media (max-width: 768px) {
-    font-size: 13px;
-    padding: 6px 10px;
+    font-size: 14px;
+    padding: 10px 14px;
   }
   
   &::after {
     content: '';
     position: absolute;
-    border-width: 6px;
+    border-width: 8px;
     border-style: solid;
     
     ${props => {
       switch (props.$position) {
         case 'top':
           return `
-            border-color: #2D3748 transparent transparent transparent;
+            border-color: #1E293B transparent transparent transparent;
             top: 100%;
             left: 50%;
             transform: translateX(-50%);
           `;
         case 'right':
           return `
-            border-color: transparent #2D3748 transparent transparent;
+            border-color: transparent #1E293B transparent transparent;
             top: 50%;
-            right: 100%;
-            transform: translateY(-50%);
+            left: 0;
+            transform: translateY(-50%) translateX(-100%);
           `;
         case 'bottom':
           return `
-            border-color: transparent transparent #2D3748 transparent;
-            bottom: 100%;
+            border-color: transparent transparent #1E293B transparent;
+            top: 0;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(-100%);
           `;
         case 'left':
           return `
-            border-color: transparent transparent transparent #2D3748;
+            border-color: transparent transparent transparent #1E293B;
             top: 50%;
-            left: 100%;
-            transform: translateY(-50%);
+            right: 0;
+            transform: translateY(-50%) translateX(100%);
           `;
         default:
           return '';
@@ -197,88 +197,39 @@ export const Tooltip: React.FC<TooltipProps> = ({
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (!touchFriendly) return;
     e.stopPropagation();
-    showTooltip();
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!touchFriendly) return;
-    e.stopPropagation();
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
+    if (touchFriendly && isTouchDevice) {
+      updatePosition();
+      setVisible(!visible);
     }
-    timerRef.current = setTimeout(() => {
-      setVisible(false);
-    }, 1000);
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (visible) {
-        updatePosition();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, true);
-    window.addEventListener('resize', updatePosition);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll, true);
-      window.removeEventListener('resize', updatePosition);
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, [visible]);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-      setVisible(false);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (isTouchDevice && window.innerWidth < 768) {
-        if (position === 'left' || position === 'right') {
-          updatePosition();
-        }
-      }
-    };
-    
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [position, isTouchDevice]);
+  // If JS is disabled, hide the tooltip 
+  if (!isMounted) {
+    return <>{children}</>;
+  }
 
   return (
     <TooltipContainer className={className}>
       <TooltipTrigger
         ref={triggerRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onClick={(e) => e.stopPropagation()}
+        onMouseEnter={!isTouchDevice ? handleMouseEnter : undefined}
+        onMouseLeave={!isTouchDevice ? handleMouseLeave : undefined}
+        onTouchStart={touchFriendly ? handleTouchStart : undefined}
+        onClick={(e) => touchFriendly && e.stopPropagation()}
       >
         {children}
       </TooltipTrigger>
-      {isMounted && visible && typeof document !== 'undefined' && createPortal(
-        <TooltipContent 
-          $position={position} 
-          $visible={visible} 
-          $maxWidth={maxWidth}
-          $top={tooltipPosition.top}
-          $left={tooltipPosition.left}
-        >
-          {content}
-        </TooltipContent>,
-        document.body
-      )}
+      
+      <TooltipContent
+        $position={position}
+        $visible={visible}
+        $maxWidth={maxWidth}
+        $top={tooltipPosition.top}
+        $left={tooltipPosition.left}
+      >
+        {content}
+      </TooltipContent>
     </TooltipContainer>
   );
 };

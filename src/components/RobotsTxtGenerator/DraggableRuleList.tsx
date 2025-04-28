@@ -174,6 +174,17 @@ const Title = styled.h3`
   margin: 0 0 16px 0;
 `;
 
+// Helper function to safely display comment content
+const sanitizeComment = (comment?: string): string => {
+  if (!comment) return '';
+  
+  // Basic sanitization to prevent XSS
+  return comment
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .substring(0, 80) + (comment.length > 80 ? '...' : '');
+};
+
 const DraggableRuleList: React.FC<DraggableRuleListProps> = ({
   rules,
   onRulesChange,
@@ -242,7 +253,10 @@ const DraggableRuleList: React.FC<DraggableRuleListProps> = ({
                               <RuleDetails>
                                 <span>{formatBotNames(rule.bot)}</span>
                                 {rule.comment && (
-                                  <Tooltip content={rule.comment} position="bottom">
+                                  <Tooltip 
+                                    content={sanitizeComment(rule.comment)} 
+                                    position="bottom"
+                                  >
                                     <span> • <em>Has comment</em></span>
                                   </Tooltip>
                                 )}
@@ -298,7 +312,10 @@ const DraggableRuleList: React.FC<DraggableRuleListProps> = ({
                     <RuleDetails>
                       <span>{formatBotNames(rule.bot)}</span>
                       {rule.comment && (
-                        <Tooltip content={rule.comment} position="bottom">
+                        <Tooltip 
+                          content={sanitizeComment(rule.comment)} 
+                          position="bottom"
+                        >
                           <span> • <em>Has comment</em></span>
                         </Tooltip>
                       )}

@@ -5,11 +5,13 @@ import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import Button from '../common/Button';
 import Tooltip from '../common/Tooltip';
+import FormError from '../common/FormError';
 import { RobotRule, AllowDisallow } from './RobotsTxtGenerator';
 import { FaInfoCircle, FaPlus, FaMinus, FaLightbulb } from 'react-icons/fa';
 import GlossaryTermTooltip from './GlossaryTerms';
 import SemrushTooltip from '../common/SemrushTooltip';
 import { getRandomTipForField } from '@/data/SemrushTooltipTips';
+import { validatePath, validateComment } from '@/utils/validation';
 
 interface CustomRuleBuilderProps {
   onAddRule: (rule: RobotRule) => void;
@@ -287,6 +289,8 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
   const [permission, setPermission] = useState<AllowDisallow>('allow');
   const [path, setPath] = useState<string>('');
   const [comment, setComment] = useState<string>('');
+  const [commentError, setCommentError] = useState<string | undefined>();
+  const [pathError, setPathError] = useState<string | undefined>();
   const [selectedBots, setSelectedBots] = useState<string[]>(['All']);
   const [selectedPattern, setSelectedPattern] = useState<string>("");
   
@@ -328,12 +332,50 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
   };
   
   const handlePathChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPath(e.target.value);
+    const newPath = e.target.value;
+    setPath(newPath);
+    
+    // Validate path
+    const validation = validatePath(newPath);
+    if (!validation.valid) {
+      setPathError(validation.message);
+    } else {
+      setPathError(undefined);
+    }
+  };
+  
+  const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newComment = e.target.value;
+    setComment(newComment);
+    
+    // Validate comment
+    if (newComment) {
+      const validation = validateComment(newComment);
+      if (!validation.valid) {
+        setCommentError(validation.message);
+      } else {
+        setCommentError(undefined);
+      }
+    } else {
+      setCommentError(undefined);
+    }
   };
   
   const handleAddRule = () => {
-    if (!path.trim()) {
+    // Validate path before adding
+    const pathValidation = validatePath(path);
+    if (!pathValidation.valid) {
+      setPathError(pathValidation.message);
       return;
+    }
+    
+    // Validate comment before adding (if provided)
+    if (comment) {
+      const commentValidation = validateComment(comment);
+      if (!commentValidation.valid) {
+        setCommentError(commentValidation.message);
+        return;
+      }
     }
     
     onAddRule({
@@ -347,6 +389,8 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
     // Reset the form
     setPath('');
     setComment('');
+    setCommentError(undefined);
+    setPathError(undefined);
     setPermission('allow');
     setSelectedBots(['All']);
     setSelectedPattern('');
@@ -376,12 +420,16 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
             <option value="wildcard">Wildcard</option>
             <option value="extension">File extension</option>
           </Select>
-          <Input
-            type="text"
-            value={path}
-            onChange={handlePathChange}
-            placeholder={selectedPattern ? placeholderByPattern[selectedPattern] : "e.g. /wp-admin/, /*.pdf$"}
-          />
+          <div style={{ flex: 1 }}>
+            <Input
+              type="text"
+              value={path}
+              onChange={handlePathChange}
+              placeholder={selectedPattern ? placeholderByPattern[selectedPattern] : "e.g. /wp-admin/, /*.pdf$"}
+              style={{ borderColor: pathError ? '#e53e3e' : '' }}
+            />
+            <FormError message={pathError} />
+          </div>
         </FlexRow>
       </FormGroup>
       
@@ -449,12 +497,16 @@ const CustomRuleBuilder: React.FC<CustomRuleBuilderProps> = ({ onAddRule }) => {
             <InfoIcon size={16} />
           </Tooltip>
         </Label>
-        <Input
-          type="text"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="E.g., Block admin pages from all search engines"
-        />
+        <div>
+          <Input
+            type="text"
+            value={comment}
+            onChange={handleCommentChange}
+            placeholder="E.g., Block admin pages from all search engines"
+            style={{ borderColor: commentError ? '#e53e3e' : '' }}
+          />
+          <FormError message={commentError} />
+        </div>
       </FormGroup>
       
       <ButtonGroup>

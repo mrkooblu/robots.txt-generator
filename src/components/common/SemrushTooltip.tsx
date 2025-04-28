@@ -3,7 +3,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Tooltip from './Tooltip';
-import { FaInfoCircle } from 'react-icons/fa';
+import InfoIcon from './InfoIcon';
 import { theme } from '@/styles/theme';
 
 interface SemrushTooltipProps {
@@ -15,38 +15,31 @@ interface SemrushTooltipProps {
   className?: string;
 }
 
-const InfoIcon = styled(FaInfoCircle)`
-  color: ${theme.colors.primary};
-  margin-left: 6px;
-  cursor: help;
-  vertical-align: middle;
-  
-  &:hover {
-    color: ${theme.colors.hover};
-  }
-`;
-
 const TooltipContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  font-size: 14px;
+  line-height: 1.6;
 `;
 
 const TipText = styled.div`
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.6;
+  color: white;
 `;
 
 const SemrushLink = styled.a`
-  color: white;
+  color: #60A5FA; /* Light blue color from design */
   font-weight: 500;
   font-size: 12px;
-  text-decoration: underline;
+  text-decoration: none;
   display: flex;
   align-items: center;
   margin-top: 4px;
   
   &:hover {
+    text-decoration: underline;
     opacity: 0.9;
   }
   
@@ -62,7 +55,7 @@ const SemrushTooltip: React.FC<SemrushTooltipProps> = ({
   semrushLink,
   linkText,
   position = 'top',
-  size = 16,
+  size = 18,
   className
 }) => {
   const tooltipContent = (

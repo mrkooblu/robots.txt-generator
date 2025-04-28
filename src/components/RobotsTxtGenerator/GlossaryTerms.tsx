@@ -108,6 +108,11 @@ const TermHighlight = styled.span`
   border-bottom: 1px dotted #3B82F6;
   cursor: help;
   color: #2563EB;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: #1D4ED8;
+  }
 `;
 
 export const GlossaryTermTooltip: React.FC<GlossaryTermTooltipProps> = ({ term, children }) => {

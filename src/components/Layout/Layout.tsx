@@ -2,6 +2,7 @@
 
 import React, { ReactNode } from 'react';
 import styled from 'styled-components';
+import HeroBanner from './HeroBanner';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,27 +16,6 @@ const Container = styled.div`
   box-sizing: border-box;
 `;
 
-const HeaderContent = styled.div`
-  margin-bottom: 32px;
-`;
-
-const Title = styled.h1`
-  font-family: 'Manrope', sans-serif;
-  font-size: ${props => props.theme.heading.h1.fontSize};
-  line-height: ${props => props.theme.heading.h1.lineHeight};
-  font-weight: ${props => props.theme.heading.h1.fontWeight};
-  margin: 0 0 16px;
-  color: ${props => props.theme.colors.text.primary};
-`;
-
-const Subtitle = styled.p`
-  font-size: ${props => props.theme.heading.body.fontSize};
-  line-height: ${props => props.theme.heading.body.lineHeight};
-  max-width: 800px;
-  margin: 0;
-  color: ${props => props.theme.colors.text.secondary};
-`;
-
 const Main = styled.main`
   padding: 48px 0;
   background-color: ${props => props.theme.colors.background.secondary};
@@ -44,16 +24,14 @@ const Main = styled.main`
 `;
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const title = "Robots.txt Generator";
+  const description = "Generate a robots.txt file for your website with ease. This tool builds robots.txt parameters that allow Google Analytics to measure Custom Campaigns, so you can see exactly what's working.";
+
   return (
     <>
+      <HeroBanner title={title} description={description} />
       <Main>
         <Container>
-          <HeaderContent>
-            <Title>Robots.txt Generator</Title>
-            <Subtitle>
-              Generate a robots.txt file for your website with ease. This tool builds robots.txt parameters that allow Google Analytics to measure Custom Campaigns, so you can see exactly what's working.
-            </Subtitle>
-          </HeaderContent>
           {children}
         </Container>
       </Main>

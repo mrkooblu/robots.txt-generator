@@ -1,8 +1,15 @@
-import type { Metadata } from 'next';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Robots.txt Generator',
-  description: 'Generate a robots.txt file for your website with ease. This tool builds robots.txt parameters that control how search engines crawl your site.',
+  title: 'Robots.txt Generator - Build, validate, and optimize robots.txt files',
+  description: 'Create perfect robots.txt files for your website with our easy-to-use generator. Customize rules, validate syntax, and optimize for optimal crawling and indexing.',
+  keywords: ['robots.txt', 'SEO', 'search engine optimization', 'web crawlers', 'indexing'],
+  authors: [{ name: 'Robots.txt Generator' }],
+  openGraph: {
+    title: 'Robots.txt Generator - Build, validate, and optimize robots.txt files',
+    description: 'Create perfect robots.txt files for your website with our easy-to-use generator. Customize rules, validate syntax, and optimize for optimal crawling and indexing.',
+    type: 'website'
+  },
   icons: {
     icon: '/favicon.ico',
   },

@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import Button from '../common/Button';
+import LoadingButton from '../common/LoadingButton';
 import Tooltip from '../common/Tooltip';
+import InfoIcon from '../common/InfoIcon';
 import { RobotRule, Sitemap, AllowDisallow, generateRobotsTxt } from './RobotsTxtGenerator';
-import { FaInfoCircle, FaUndo, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 interface SuggestionsProps {
   onRulesChange: (rules: RobotRule[]) => void;
@@ -14,6 +16,7 @@ interface SuggestionsProps {
   onTabChange: () => void;
   onGenerate: () => void;
   suggestionsType?: 'general' | 'cms';
+  isGenerating?: boolean;
 }
 
 const Container = styled.div`
@@ -96,21 +99,6 @@ const OptionLabel = styled.label`
   @media (max-width: ${props => props.theme.breakpoints.sm}) {
     font-size: 14px;
     line-height: 1.3;
-  }
-`;
-
-const InfoIcon = styled.span`
-  display: inline-flex;
-  color: #718096;
-  cursor: help;
-  margin-left: 8px;
-  position: relative;
-  z-index: 10;
-  align-items: center;
-  transition: color 0.2s ease;
-  
-  &:hover {
-    color: #4A5568;
   }
 `;
 
@@ -915,6 +903,7 @@ const Suggestions: React.FC<SuggestionsProps> = ({
   onTabChange,
   onGenerate,
   suggestionsType = 'general',
+  isGenerating = false,
 }) => {
   const [selectedId, setSelectedId] = useState<string>('');
   const [sitemapUrl, setSitemapUrl] = useState<string>('');
@@ -995,9 +984,9 @@ const Suggestions: React.FC<SuggestionsProps> = ({
                   position="top"
                   maxWidth="300px"
                 >
-                  <InfoIcon onClick={(e) => e.stopPropagation()}>
-                    <FaInfoCircle size={16} />
-                  </InfoIcon>
+                  <span onClick={(e) => e.stopPropagation()}>
+                    <InfoIcon size={18} />
+                  </span>
                 </Tooltip>
               </OptionLabel>
               <PreviewToggle 
@@ -1043,30 +1032,19 @@ const Suggestions: React.FC<SuggestionsProps> = ({
         </DisclaimerCheckbox>
       </DisclaimerSection>
       
-      <ActionRow>
-        <Button
+      <div style={{ marginTop: '24px', display: 'flex', gap: '16px' }}>
+        <LoadingButton
           onClick={onGenerate}
-          disabled={!selectedId || !disclaimerChecked}
-          variant="primary"
+          isLoading={isGenerating}
+          loadingText="Generating..."
+          disabled={!selectedId}
         >
           Generate robots.txt
+        </LoadingButton>
+        <Button variant="outline" onClick={onTabChange}>
+          Advanced Options
         </Button>
-        <Button 
-          onClick={handleReset} 
-          variant="outline"
-          icon={<FaUndo />}
-        >
-          Reset
-        </Button>
-        {suggestionsType === 'general' && (
-          <Button 
-            onClick={onTabChange} 
-            variant="outline"
-          >
-            Advanced Options
-          </Button>
-        )}
-      </ActionRow>
+      </div>
     </Container>
   );
 };

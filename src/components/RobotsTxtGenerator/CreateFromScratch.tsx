@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import Button from '../common/Button';
+import LoadingButton from '../common/LoadingButton';
 import Tooltip from '../common/Tooltip';
 import SemrushTooltip from '../common/SemrushTooltip';
 import { RobotRule, Sitemap, AllowDisallow, generateRobotsTxt } from './RobotsTxtGenerator';
@@ -12,6 +13,8 @@ import CustomRuleBuilder from './CustomRuleBuilder';
 import DraggableRuleList from './DraggableRuleList';
 import UrlTester from './UrlTester';
 import { getRandomTipForField } from '@/data/SemrushTooltipTips';
+import { validateURL } from '@/utils/validation';
+import FormInput from '../common/FormInput';
 
 interface CreateFromScratchProps {
   rules: RobotRule[];
@@ -22,6 +25,7 @@ interface CreateFromScratchProps {
   onReset: () => void;
   disclaimerAgreed: boolean;
   onDisclaimerChange: (agreed: boolean) => void;
+  isGenerating?: boolean;
 }
 
 const Container = styled.div`
@@ -156,6 +160,7 @@ const CreateFromScratch: React.FC<CreateFromScratchProps> = ({
   onReset,
   disclaimerAgreed,
   onDisclaimerChange,
+  isGenerating = false,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('builder');
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
@@ -402,11 +407,11 @@ const CreateFromScratch: React.FC<CreateFromScratchProps> = ({
                 position="top"
               />
             </SitemapLabel>
-            <Input
-              type="text"
-              value={sitemap[0]?.url || ''}
-              onChange={(e) => updateSitemap(e.target.value)}
-              placeholder="https://your-site.com/sitemap.xml"
+            <FormInput
+              value={sitemap.length > 0 ? sitemap[0].url : ''}
+              onChange={updateSitemap}
+              placeholder="https://example.com/sitemap.xml"
+              onValidate={validateURL}
             />
           </SitemapSection>
         </TabContent>
@@ -431,17 +436,17 @@ const CreateFromScratch: React.FC<CreateFromScratchProps> = ({
       </DisclaimerContainer>
       
       <ActionRow>
-        <Button
+        <LoadingButton 
           onClick={onGenerate}
-          disabled={!disclaimerAgreed}
-          variant="primary"
+          isLoading={isGenerating}
+          loadingText="Generating..."
+          disabled={rules.length === 0 || !disclaimerAgreed}
         >
           Generate robots.txt
-        </Button>
+        </LoadingButton>
         <Button 
           onClick={onReset} 
           variant="outline"
-          icon={<FaUndo />}
         >
           Reset
         </Button>
