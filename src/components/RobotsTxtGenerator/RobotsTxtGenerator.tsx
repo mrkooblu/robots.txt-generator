@@ -289,7 +289,7 @@ const RobotsTxtGenerator: React.FC = () => {
         <ResultModal 
           isOpen={isModalOpen} 
           onClose={handleCloseModal} 
-          content={robotsTxt}
+          robotsTxt={robotsTxt}
         />
       </div>
     </ErrorBoundary>
